@@ -1,243 +1,193 @@
 <script>
 	import { beforeUpdate, afterUpdate } from 'svelte';
 	import { stopTyping } from '$lib/actions.js';
-	let text = `Enter some beeps to boop.`;
+	let textIn = `Enter some beeps to boop.`;
 	let binary = `01000101 01101110 01110100 01100101 01110010 00100000 01110011 01101111 01101101 01100101 00100000 01100010 01100101 01100101 01110000 01110011 00100000 01110100 01101111 00100000 01100010 01101111 01101111 01110000 00101110`;
 	let beepboops = `Boop beep boop boop boop beep boop beep    Boop beep beep boop beep beep beep boop    Boop beep beep beep boop beep boop boop    Boop beep beep boop boop beep boop beep    Boop beep beep beep boop boop beep boop    Boop boop beep boop boop boop boop boop    Boop beep beep beep boop boop beep beep    Boop beep beep boop beep beep beep beep    Boop beep beep boop beep beep boop beep    Boop beep beep boop boop beep boop beep    Boop boop beep boop boop boop boop boop    Boop beep beep boop boop boop beep boop    Boop beep beep boop boop beep boop beep    Boop beep beep boop boop beep boop beep    Boop beep beep beep boop boop boop boop    Boop beep beep beep boop boop beep beep    Boop boop beep boop boop boop boop boop    Boop beep beep beep boop beep boop boop    Boop beep beep boop beep beep beep beep    Boop boop beep boop boop boop boop boop    Boop beep beep boop boop boop beep boop    Boop beep beep boop beep beep beep beep    Boop beep beep boop beep beep beep beep    Boop beep beep beep boop boop boop boop    Boop boop beep boop beep beep beep boop`;
 	let beep = 1;
 	let boop = 0;
-	let textIn = 'text';
 	let textOut = 'text';
 	let typing = false;
 
-	let translations = {
-		text: text,
-		int: '',
-		binary: binary,
-		robot: '',
-		octal: '',
-		hex: '',
-		custom: ''
-	};
+	let translations
+
+	initialize();
+
+	function initialize() {
+		const initialText = textIn.split(/(?:)/u);
+		const initialInt = stringToInt(initialText);
+		const initialBinary = intToBinary(initialInt);
+		const initialRobot = binaryToRobot(initialBinary);
+		const initialOctal = intToOctal(initialInt);
+		const initialHex = intToHex(initialInt);
+		const initialCustom = initialRobot;
+
+		translations = {
+		text: initialText,
+		int: initialInt,
+		binary: initialBinary,
+		robot: initialRobot,
+		octal: initialOctal,
+		hex: initialHex,
+		custom: initialCustom,
+		}
+	}
 
 	let inType = 'text';
 	let outType = 'robot';
 
-	function stringToInt(value) {
-		if (value.length === 0) {
-			return;
+	function stringToInt(stringArray) {
+		if (stringArray.length === 0) {
+			return 0;
 		}
-		const out = value.split(/(?:)/u).map((char) => char.charCodeAt(0));
-		return out;
-		// let intValue = '';
-		// for (let i = 0; i < value.length; i++) {
-		// 	let intChar = value[i].charCodeAt(0);
-		// 	intValue += intChar;
-		// 	if (i + 1 != value.length) {
-		// 		intValue += ' ';
-		// 	}
-		// }
-		// return intValue;
+		return stringArray.map(value => value.charCodeAt(0));
 	}
 
-	function intToString(value) {
-		if (value.length === 0) {
-			return;
+	function intToString(intArray) {
+		if (intArray.length === 0) {
+			return 0;
 		}
-		let stringValue = '';
-		let intArray = value.split(' ');
-		for (let i = 0; i < intArray.length; i++) {
-			let stringChar = String.fromCharCode(intArray[i]);
-			stringValue += stringChar;
-		}
-		return stringValue;
+		return intArray.map(value => String.fromCharCode(value))
 	}
 
-	function binaryToInt(value) {
-		if (value.length === 0) {
-			return;
+	function binaryToInt(binaryArray) {
+		if (binaryArray.length === 0) {
+			return 0;
 		}
-		let intValue = '';
-		let binaryArray = value.split(' ');
-		for (let i = 0; i < binaryArray.length; i++) {
-			let intChar = parseInt(binaryArray[i], 2);
-			if (intChar) {
-				intValue += intChar + ' ';
-			}
-		}
-		return value; //intValue;
+		return binaryArray.map(value => parseInt(value, 2));
 	}
 
 	function intToBinary(intArray) {
 		if (intArray.length < 1) {
 			return 0;
 		}
-		let binaryValue = [];
-		for (let i = 0; i < intArray.length; i++) {
-			binaryValue.push(intArray[i].toString(2));
-		}
-		return binaryValue;
+		return intArray.map(value => value.toString(2).padStart(8, '0'));
 	}
 
-	function robotToInt(value) {
-		if (value.length === 0) {
+	function binaryToRobot(binaryArray) {
+		if (binaryArray.length === 0) {
+			return 0;
+		}
+		return binaryArray.map(value => {
+			let beepboopChar = '';
+			for (let i = 0; i < value.length; i++) {
+				if (i === 0) {
+					beepboopChar += 'B';
+				} else {
+					beepboopChar += 'b';
+				}
+				if (value[i] === '0') {
+					beepboopChar += 'oop';
+				} else if (value[i] === '1') {
+					beepboopChar += 'eep';
+				}
+			}
+			return beepboopChar;
+		});
+		
+	}
+
+	function robotToInt(binaryArray) {
+		if (binaryArray.length === 0) {
 			return;
 		}
-		let intValue = '';
-		for (let i = 0; i < value.length; i++) {
+		let intbinaryArray = '';
+		for (let i = 0; i < binaryArray.length; i++) {
 			let binaryString = '';
-			for (let j = 0; j < value[i].length; j++) {
-				if (value[i][j] === 'B') {
+			for (let j = 0; j < binaryArray[i].length; j++) {
+				if (binaryArray[i][j] === 'B') {
 					binaryString += '1';
-				} else if (value[i][j] === 'b') {
+				} else if (binaryArray[i][j] === 'b') {
 					binaryString += '0';
 				}
 			}
 			let intChar = parseInt(binaryString, 2);
 			if (intChar) {
-				intValue += intChar + ' ';
+				intbinaryArray += intChar + ' ';
 			}
 		}
-		return intValue;
+		return intbinaryArray;
 	}
 
-	function intToRobot(value) {
-		if (value.length === 0) {
-			return;
-		}
-		let beepboopValue = '';
-		for (let i = 0; i < value.length; i++) {
-			let binaryChar = value[i].toString(2);
-			let beepboopChar = '';
-			for (let j = 0; j < binaryChar.length; j++) {
-				if (j === 0) {
-					beepboopChar += 'B';
-				} else {
-					beepboopChar += 'b';
-				}
-				if (binaryChar[j] === '0') {
-					beepboopChar += 'oop';
-				} else if (binaryChar[j] === '1') {
-					beepboopChar += 'eep';
-				}
-			}
-			beepboopChar += ' ';
-			beepboopValue += beepboopChar;
-		}
-		return beepboopValue.trim();
+	function octalToInt(value) {
+		return 0
 	}
 
-	$: if (typing === false && textIn != translations[inType]) {
+	function intToOctal(value) {
+		return 0
+	}
+
+	function hexToInt(value) {
+		return 0
+	}
+
+	function intToHex(value) {
+		return 0
+	}
+
+	function customToInt(value) {
+		return 0
+	}
+
+	function intToCustom(value) {
+		return 0
+	}
+
+	// $: if (typing === false && textIn != translations[inType]) {
+	function updateTranslations() {
 		translate();
-		textOut = translations[outType];
+		textOut = translations[outType].join(' ');
 	}
 
 	function changeTypeIn() {
-		textIn = translations[inType];
+		textIn = translations[inType].join(inType != 'text' ? ' ': '');
 	}
 
 	function changeTypeOut() {
-		textOut = translations[outType];
+		textOut = translations[outType].join(outType != 'text' ? ' ': '');;
+	}
+
+	function swapTypes() {
+		let temp = inType;
+		inType = outType;
+		outType = temp;
+		changeTypeIn()
+		changeTypeOut()
 	}
 
 	function translate() {
 		translations[inType] = textIn;
 		switch (inType) {
 			case 'text':
-				translations['int'] = stringToInt(textIn);
+				translations['int'] = stringToInt(textIn.split(/(?:)/u));
 				break;
 			case 'binary':
-				translations['int'] = binaryToInt(textIn);
+				translations['int'] = binaryToInt(textIn.split(' '));
 				break;
 			case 'robot':
-				translations['int'] = robotToInt(textIn);
+				translations['int'] = robotToInt(textIn.split(' '));
 				break;
 			case 'octal':
-				translations['int'] = octalToInt(textIn);
+				translations['int'] = octalToInt(textIn.split(' '));
 				break;
 			case 'hex':
-				translations['int'] = hexToInt(textIn);
+				translations['int'] = hexToInt(textIn.split(' '));
 				break;
 			case 'custom':
-				translations['int'] = customToInt(textIn);
+				translations['int'] = customToInt(textIn.split(' '));
 				break;
 			default:
 				textOut = 'Error: Invalid input type';
 				return;
 		}
-		switch (outType) {
-			case 'text':
-				translations['text'] = intToString(translations['int']);
-				break;
-			case 'binary':
-				translations['binary'] = intToBinary(translations['int']);
-				break;
-			case 'robot':
-				translations['robot'] = intToRobot(translations['int']);
-				break;
-			case 'octal':
-				translations['octal'] = intToOctal(translations['int']);
-				break;
-			case 'hex':
-				translations['hex'] = intToHex(translations['int']);
-				break;
-			case 'custom':
-				translations['custom'] = intToCustom(translations['int']);
-				break;
-			default:
-				textOut = 'Error: Invalid output type';
-				return;
-		}
+		translations['text'] = intToString(translations['int']);
+		translations['binary'] = intToBinary(translations['int']);
+		translations['robot'] = binaryToRobot(translations['binary']);
+		translations['octal'] = intToOctal(translations['int']);
+		translations['hex'] = intToHex(translations['int']);
+		translations['custom'] = intToCustom(translations['int']);
+
 	}
-
-	// async function updateOutput() {
-	// 	console.log('I am updating the output');
-	// 	if (textIn.length === 0) {
-	// 		return;
-	// 	}
-	// 	textOut = "I'm a robot";
-	// }
-
-	function updateFromText(value) {
-		let binaryOutput = '';
-		let beepboopOutput = '';
-		let length = value.length;
-		if (length === 0) {
-			return;
-		}
-		for (let i = 0; i < value.length; i++) {
-			let binaryString = value[i].charCodeAt(0).toString(2).padStart(8, '0');
-			console.log(binaryString);
-			for (let j = 0; j < binaryString.length; j++) {
-				if (j === 0) {
-					beepboopOutput += 'B';
-				} else {
-					beepboopOutput += 'b';
-				}
-				if (binaryString[j] === '0') {
-					beepboopOutput += 'oop';
-				}
-				if (binaryString[j] === '1') {
-					beepboopOutput += 'eep';
-				}
-				if (j + 1 != binaryString.length) {
-					beepboopOutput += ' ';
-				}
-			}
-			binaryOutput += binaryString;
-			if (i + 1 != value.length) {
-				binaryOutput += ' ';
-				beepboopOutput += '    ';
-			}
-		}
-		binary = binaryOutput;
-		beepboops = beepboopOutput;
-		textOut = beepboopOutput;
-	}
-
-	function toBinary() {}
-
-	function toBeepBoops() {}
 </script>
 
 <link
@@ -246,12 +196,12 @@
 />
 
 <section class="mx-4 lg:mx-16">
-	<div class="instructions my-2 ghost">
+	<div class="instructions my-2 bg-slate-700 px-8 py-4 rounded shadow-md">
 		<p class="justify-self-start">
-			<span style="color:cyan;font-weight:600">Return</span> to translate!
+			<span style="color:cyan;font-weight:600">Type</span> something to translate!
 		</p>
 	</div>
-	<div class="logging justify-self-end bg-cyan-800 p-4 rounded shadow-md" on:load={translate()}>
+	<div hidden class="logging justify-self-end bg-cyan-800 p-4 rounded shadow-md" on:load={translate()}>
 		<h2 class="text-lg border-b-solid border-b-2 border-cyan-500">Logging</h2>
 		<ul class="my-2 flex gap-2 flex-wrap flex-row items-baseline content-stretch justify-around">
 			<li style="flex: 1 0 auto;">
@@ -298,11 +248,10 @@
 					bind:value={textIn}
 					use:stopTyping
 					on:keydown={() => (typing = true)}
-					on:stopTyping={() => (typing = false)}
+					on:stopTyping={updateTranslations()}
 				/>
 			</div>
-			<label for="swap">Not yet implemented</label>
-			<button name="swap" disabled class="material-symbols-outlined py-4 ghost">
+			<button name="swap" class="material-symbols-outlined p-4 " on:click={swapTypes}  >
 				<span class="block md:hidden">swap_vertical_circle</span>
 				<span class="hidden md:block">swap_horizontal_circle</span>
 			</button>
