@@ -3,15 +3,17 @@
 	import { stopTyping } from '$lib/actions.js';
 	let textIn = `Enter some beeps to boop.`;
 	let binary = `01000101 01101110 01110100 01100101 01110010 00100000 01110011 01101111 01101101 01100101 00100000 01100010 01100101 01100101 01110000 01110011 00100000 01110100 01101111 00100000 01100010 01101111 01101111 01110000 00101110`;
-	let beepboops = `Boop beep boop boop boop beep boop beep    Boop beep beep boop beep beep beep boop    Boop beep beep beep boop beep boop boop    Boop beep beep boop boop beep boop beep    Boop beep beep beep boop boop beep boop    Boop boop beep boop boop boop boop boop    Boop beep beep beep boop boop beep beep    Boop beep beep boop beep beep beep beep    Boop beep beep boop beep beep boop beep    Boop beep beep boop boop beep boop beep    Boop boop beep boop boop boop boop boop    Boop beep beep boop boop boop beep boop    Boop beep beep boop boop beep boop beep    Boop beep beep boop boop beep boop beep    Boop beep beep beep boop boop boop boop    Boop beep beep beep boop boop beep beep    Boop boop beep boop boop boop boop boop    Boop beep beep beep boop beep boop boop    Boop beep beep boop beep beep beep beep    Boop boop beep boop boop boop boop boop    Boop beep beep boop boop boop beep boop    Boop beep beep boop beep beep beep beep    Boop beep beep boop beep beep beep beep    Boop beep beep beep boop boop boop boop    Boop boop beep boop beep beep beep boop`;
+	let beepboops = `Boopbeepboopboopboopbeepboopbeep Boopbeepbeepboopbeepbeepbeepboop Boopbeepbeepbeepboopbeepboopboop Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepbeepboopboopbeepboop Boopboopbeepboopboopboopboopboop Boopbeepbeepbeepboopboopbeepbeep Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepboopbeepbeepboopbeep Boopbeepbeepboopboopbeepboopbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepboopboopboopbeepboop Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepbeepboopboopboopboop Boopbeepbeepbeepboopboopbeepbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepbeepboopbeepboopboop Boopbeepbeepboopbeepbeepbeepbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepboopboopboopbeepboop Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepbeepboopboopboopboop Boopboopbeepboopbeepbeepbeepboop`;
 	let beep = 1;
 	let boop = 0;
-	let textOut = 'text';
+	
 	let typing = false;
 
 	let translations
 
-	initialize();
+	initialize()
+
+	let textOut = translations.robot.join(' ');
 
 	function initialize() {
 		const initialText = textIn.split(/(?:)/u);
@@ -37,36 +39,36 @@
 	let outType = 'robot';
 
 	function stringToInt(stringArray) {
-		if (stringArray.length === 0) {
-			return 0;
+		if (stringArray.length < 1) {
+			return [];
 		}
 		return stringArray.map(value => value.charCodeAt(0));
 	}
 
 	function intToString(intArray) {
-		if (intArray.length === 0) {
-			return 0;
+		if (intArray.length < 1) {
+			return [];
 		}
-		return intArray.map(value => String.fromCharCode(value))
+		return intArray.map(value => String.fromCharCode(value));
 	}
 
 	function binaryToInt(binaryArray) {
-		if (binaryArray.length === 0) {
-			return 0;
+		if (binaryArray.length < 1) {
+			return [];
 		}
 		return binaryArray.map(value => parseInt(value, 2));
 	}
 
 	function intToBinary(intArray) {
 		if (intArray.length < 1) {
-			return 0;
+			return [];
 		}
 		return intArray.map(value => value.toString(2).padStart(8, '0'));
 	}
 
 	function binaryToRobot(binaryArray) {
-		if (binaryArray.length === 0) {
-			return 0;
+		if (binaryArray.length < 1) {
+			return [];
 		}
 		return binaryArray.map(value => {
 			let beepboopChar = '';
@@ -87,56 +89,58 @@
 		
 	}
 
-	function robotToInt(binaryArray) {
-		if (binaryArray.length === 0) {
-			return;
+	function robotToBinary(robotArray) {
+		if (robotArray.length < 1) {
+			return [];
 		}
-		let intbinaryArray = '';
-		for (let i = 0; i < binaryArray.length; i++) {
+		return robotArray.map(value => {
 			let binaryString = '';
-			for (let j = 0; j < binaryArray[i].length; j++) {
-				if (binaryArray[i][j] === 'B') {
+			let i = 0
+			while(i < value.length) {
+				console.log(value.substring(i + 1, i + 4))
+				if(value.substring(i + 1, i + 4) === 'eep') {
 					binaryString += '1';
-				} else if (binaryArray[i][j] === 'b') {
+				} else if (value.substring(i+1, i + 4) === 'oop') {
 					binaryString += '0';
+				} else {
+					return 'Error: Invalid beep boop';
 				}
+
+				i += 4
 			}
-			let intChar = parseInt(binaryString, 2);
-			if (intChar) {
-				intbinaryArray += intChar + ' ';
-			}
-		}
-		return intbinaryArray;
+			return binaryString;
+		});
 	}
 
 	function octalToInt(value) {
-		return 0
+		return []
 	}
 
 	function intToOctal(value) {
-		return 0
+		return []
 	}
 
 	function hexToInt(value) {
-		return 0
+		return []
 	}
 
 	function intToHex(value) {
-		return 0
+		return []
 	}
 
 	function customToInt(value) {
-		return 0
+		return []
 	}
 
 	function intToCustom(value) {
-		return 0
+		return []
 	}
 
 	// $: if (typing === false && textIn != translations[inType]) {
 	function updateTranslations() {
 		translate();
-		textOut = translations[outType].join(' ');
+		textOut = translations[outType].join(outType != 'text' ? ' ': '');
+		
 	}
 
 	function changeTypeIn() {
@@ -144,7 +148,7 @@
 	}
 
 	function changeTypeOut() {
-		textOut = translations[outType].join(outType != 'text' ? ' ': '');;
+		textOut = translations[outType].join(outType != 'text' ? ' ': '');
 	}
 
 	function swapTypes() {
@@ -156,37 +160,52 @@
 	}
 
 	function translate() {
-		translations[inType] = textIn;
+		
 		switch (inType) {
 			case 'text':
-				translations['int'] = stringToInt(textIn.split(/(?:)/u));
+				translations.text = textIn.trim().split(/(?:)/u);
+				translations.int = stringToInt(translations.text);
 				break;
 			case 'binary':
-				translations['int'] = binaryToInt(textIn.split(' '));
+				translations.text = textIn.trim().split(/(?:)/u);
+				translations.int = binaryToInt(textIn.split(' '));
 				break;
 			case 'robot':
-				translations['int'] = robotToInt(textIn.split(' '));
+				translations.binary = robotToBinary(textIn.trim().split(' '));
+				translations.int = binaryToInt(translations.binary);
 				break;
 			case 'octal':
-				translations['int'] = octalToInt(textIn.split(' '));
+				translations.int = octalToInt(textIn.split(' '));
 				break;
 			case 'hex':
-				translations['int'] = hexToInt(textIn.split(' '));
+				translations.int = hexToInt(textIn.split(' '));
 				break;
 			case 'custom':
-				translations['int'] = customToInt(textIn.split(' '));
+				translations.int = customToInt(textIn.split(' '));
 				break;
 			default:
 				textOut = 'Error: Invalid input type';
 				return;
 		}
-		translations['text'] = intToString(translations['int']);
-		translations['binary'] = intToBinary(translations['int']);
-		translations['robot'] = binaryToRobot(translations['binary']);
-		translations['octal'] = intToOctal(translations['int']);
-		translations['hex'] = intToHex(translations['int']);
-		translations['custom'] = intToCustom(translations['int']);
 
+		if(textIn != 'text') {
+			translations.text = intToString(translations.int);
+		}
+		if(textIn != 'binary') {
+			translations.binary = intToBinary(translations.int);
+		}
+		if(textIn != 'robot') {
+			translations.robot = binaryToRobot(translations.binary);
+		}
+		if(textIn != 'octal') {
+			translations.octal = intToOctal(translations.int);
+		}
+		if(textIn != 'hex') {
+			translations.hex = intToHex(translations.int);
+		}
+		if(textIn != 'custom') {
+			translations.custom = intToCustom(translations.int);
+		}
 	}
 </script>
 
@@ -201,7 +220,7 @@
 			<span style="color:cyan;font-weight:600">Type</span> something to translate!
 		</p>
 	</div>
-	<div hidden class="logging justify-self-end bg-cyan-800 p-4 rounded shadow-md" on:load={translate()}>
+	<div hidden class="logging justify-self-end bg-cyan-800 p-4 rounded shadow-md">
 		<h2 class="text-lg border-b-solid border-b-2 border-cyan-500">Logging</h2>
 		<ul class="my-2 flex gap-2 flex-wrap flex-row items-baseline content-stretch justify-around">
 			<li style="flex: 1 0 auto;">
@@ -218,14 +237,21 @@
 			</li>
 			<li style="flex: 0 1 auto;">
 				<h3>Binary:</h3>
-				<p>{translations.binary}</p>
+				<p>{translations.binary.join(' ').slice(0,80)+"..."}</p>
 			</li>
-			<li style="flex: 1 0 auto;">
+			<li style="flex: 1 0 auto">
 				<h3>Beep boop:</h3>
-				<p>{translations.robot}</p>
+				<p>{translations.robot.join(' ').slice(0,80)+"..."}</p>
 			</li>
 		</ul>
 	</div>
+
+	{@debug textIn}
+	{@debug textOut}
+	{@debug inType}
+	{@debug outType}
+	{@debug typing}
+	{@debug translations}
 
 	<form class="my-4 py-8 px-8 sm:px-32 md:p-8 bg-pink-800 rounded shadow-md">
 		<div class="focus flex flex-col md:flex-row md:justify-between">
@@ -248,7 +274,10 @@
 					bind:value={textIn}
 					use:stopTyping
 					on:keydown={() => (typing = true)}
-					on:stopTyping={updateTranslations()}
+					on:stopTyping={() => {
+						typing = false
+						updateTranslations()
+						}}
 				/>
 			</div>
 			<button name="swap" class="material-symbols-outlined p-4 " on:click={swapTypes}  >

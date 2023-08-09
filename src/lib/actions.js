@@ -1,5 +1,5 @@
-export function stopTyping(node) {
-	const handleKeyup = debounce((event /*: KeyboardEvent*/) => {
+export async function stopTyping(node) {
+	const handleKeyup = await debounce((event /*: KeyboardEvent*/) => {
 		// (1) the debounce logic
 		if (node.contains(event.target)) {
 			// (2) restrict the event to the only referring node
