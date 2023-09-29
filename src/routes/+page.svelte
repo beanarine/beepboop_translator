@@ -1,9 +1,19 @@
 <script>
 	import { beforeUpdate, afterUpdate } from 'svelte';
 	import { stopTyping } from '$lib/actions.js';
+	
+	import { variants } from '@catppuccin/palette';
+	let selected = 'mocha';
+
+	// TODO: Verify whether these defaults are used:
+	// textIn: [ ] Yes; [ ] No
 	let textIn = `Enter some beeps to boop.`;
+	// binary: [ ] Yes; [ ] No
 	let binary = `01000101 01101110 01110100 01100101 01110010 00100000 01110011 01101111 01101101 01100101 00100000 01100010 01100101 01100101 01110000 01110011 00100000 01110100 01101111 00100000 01100010 01101111 01101111 01110000 00101110`;
+	// beepboops: [ ] Yes; [ ] No
 	let beepboops = `Boopbeepboopboopboopbeepboopbeep Boopbeepbeepboopbeepbeepbeepboop Boopbeepbeepbeepboopbeepboopboop Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepbeepboopboopbeepboop Boopboopbeepboopboopboopboopboop Boopbeepbeepbeepboopboopbeepbeep Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepboopbeepbeepboopbeep Boopbeepbeepboopboopbeepboopbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepboopboopboopbeepboop Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepboopboopbeepboopbeep Boopbeepbeepbeepboopboopboopboop Boopbeepbeepbeepboopboopbeepbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepbeepboopbeepboopboop Boopbeepbeepboopbeepbeepbeepbeep Boopboopbeepboopboopboopboopboop Boopbeepbeepboopboopboopbeepboop Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepboopbeepbeepbeepbeep Boopbeepbeepbeepboopboopboopboop Boopboopbeepboopbeepbeepbeepboop`;
+	
+	// WHY are the lets? Are they ever going to change?
 	let beep = 1;
 	let boop = 0;
 	
@@ -37,6 +47,7 @@
 
 	let inType = 'text';
 	let outType = 'robot';
+
 
 	function stringToInt(stringArray) {
 		if (stringArray.length < 1) {
@@ -167,6 +178,7 @@
 				translations.int = stringToInt(translations.text);
 				break;
 			case 'binary':
+				// check if translations.text is text first or not
 				translations.text = textIn.trim().split(/(?:)/u);
 				translations.int = binaryToInt(textIn.split(' '));
 				break;
@@ -214,99 +226,136 @@
 	href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
 />
 
-<section class="mx-4 lg:mx-16">
-	<div class="instructions my-2 bg-slate-700 px-8 py-4 rounded shadow-md">
-		<p class="justify-self-start">
-			<span style="color:cyan;font-weight:600">Type</span> something to translate!
-		</p>
-	</div>
-	<div hidden class="logging justify-self-end bg-cyan-800 p-4 rounded shadow-md">
-		<h2 class="text-lg border-b-solid border-b-2 border-cyan-500">Logging</h2>
-		<ul class="my-2 flex gap-2 flex-wrap flex-row items-baseline content-stretch justify-around">
-			<li style="flex: 1 0 auto;">
-				<h3>Typing:</h3>
-				<p>{typing}</p>
-			</li>
-			<li style="flex: 1 0 auto;">
-				<h3>Text:</h3>
-				<p>{translations.text}</p>
-			</li>
-			<li style="flex: 1 0 auto;">
-				<h3>Int:</h3>
-				<p>{translations.int}</p>
-			</li>
-			<li style="flex: 0 1 auto;">
-				<h3>Binary:</h3>
-				<p>{translations.binary.join(' ').slice(0,80)+"..."}</p>
-			</li>
-			<li style="flex: 1 0 auto">
-				<h3>Beep boop:</h3>
-				<p>{translations.robot.join(' ').slice(0,80)+"..."}</p>
-			</li>
-		</ul>
-	</div>
+<div class="wrapper {selected ? selected : ''} bg-base text-text">
+	<section class="mx-4 p-4 lg:p-8 lg:mx-16 flex flex-col gap-8 my-2">
+		<div class="instructions px-8 py-4 rounded shadow-md bg-mantle">
+			<p class="justify-self-start">
+				<span class="text-blue font-semibold">Type</span> something to translate!
+			</p>
+		</div>
 
-	{@debug textIn}
-	{@debug textOut}
-	{@debug inType}
-	{@debug outType}
-	{@debug typing}
-	{@debug translations}
-
-	<form class="my-4 py-8 px-8 sm:px-32 md:p-8 bg-pink-800 rounded shadow-md">
-		<div class="focus flex flex-col md:flex-row md:justify-between">
-			<div class="input flex flex-col basis-1/2 gap-2">
-				<label for="input">Input</label>
-				<select class="p-2 rounded shadow-md" bind:value={inType} on:change={changeTypeIn}>
-					<option value="text">Plaintext</option>
-					<option value="robot">Beep boops</option>
-					<option value="binary">Binary</option>
-					<option value="octal" disabled>Octal (not yet implemented)</option>
-					<option value="hex" disabled>Hex (not yet implemented)</option>
-					<option value="custom" disabled>Custom (not yet implemented)</option>
-				</select>
-				<textarea
-					type="text"
-					name="input"
-					rows="4"
-					class="p-2 rounded-md shadow-sm caret-pink-500
-                 focus:outline-none focus:ring-2 focus:ring-pink-500"
-					bind:value={textIn}
-					use:stopTyping
-					on:keydown={() => (typing = true)}
-					on:stopTyping={() => {
-						typing = false
-						updateTranslations()
-						}}
-				/>
+		<!-- {@debug textIn}
+		{@debug textOut}
+		{@debug inType}
+		{@debug outType}
+		{@debug typing}
+		{@debug translations} -->
+	
+		<form class="py-8 px-8 sm:px-32 md:p-8 bg-mantle rounded shadow-md">
+			<div class="focus flex flex-col md:flex-row md:justify-between">
+				<div class="input flex flex-col basis-1/2 gap-2">
+					<label for="input" class="font-semibold text-lg text-blue">Input</label>
+					<select 
+						class="p-2 rounded shadow-md bg-crust 
+							   focus:outline-none focus:ring-2 focus:ring-lavender
+							   text-subtext0 focus:text-rosewater" 
+						bind:value={inType} on:change={changeTypeIn}>
+						<option value="text">Plaintext</option>
+						<option value="robot">Beep boops</option>
+						<option value="binary">Binary</option>
+						<option value="octal" disabled>Octal (not yet implemented)</option>
+						<option value="hex" disabled>Hex (not yet implemented)</option>
+						<option value="custom" disabled>Custom (not yet implemented)</option>
+					</select>
+					<textarea
+						type="text"
+						name="input"
+						rows="4"
+						spellcheck="false"
+						class="p-2 rounded-md shadow-sm bg-crust
+						  	   focus:outline-none focus:ring-2 focus:ring-lavender 
+							   caret-rosewater text-subtext0 focus:text-rosewater"
+						bind:value={textIn}
+						use:stopTyping
+						on:keydown={() => (typing = true)}
+						on:stopTyping={() => {
+							typing = false
+							updateTranslations()
+							}}
+					/>
+				</div>
+				<button name="swap" class="material-symbols-outlined p-4 " on:click={swapTypes}  >
+					<span class="block md:hidden">swap_vertical_circle</span>
+					<span class="hidden md:block">swap_horizontal_circle</span>
+				</button>
+				<div class="output flex flex-col basis-1/2 gap-2">
+					<label for="output" class="font-semibold text-lg text-pink">Output</label>
+					<select 
+						class="p-2 rounded shadow-md bg-crust 
+						focus:outline-none focus:ring-2 focus:ring-lavender
+						text-subtext0 focus:text-rosewater" 
+			 			bind:value={outType} on:change={changeTypeOut}>
+						<option value="text">Plaintext</option>
+						<option value="robot">Beep boops</option>
+						<option value="binary">Binary</option>
+						<option value="octal" disabled>Octal (not yet implemented)</option>
+						<option value="hex" disabled>Hex (not yet implemented)</option>
+						<option value="custom" disabled>Custom (not yet implemented)</option>
+					</select>
+					<textarea
+						type="text"
+						name="output"
+						rows="4"
+						disabled
+						class="p-2 rounded-md shadow-sm bg-crust text-subtext0"
+						bind:value={textOut}
+					/>
+				</div>
 			</div>
-			<button name="swap" class="material-symbols-outlined p-4 " on:click={swapTypes}  >
-				<span class="block md:hidden">swap_vertical_circle</span>
-				<span class="hidden md:block">swap_horizontal_circle</span>
-			</button>
-			<div class="output flex flex-col basis-1/2 gap-2">
-				<label for="output">Output</label>
-				<select class="p-2 rounded shadow-md" bind:value={outType} on:change={changeTypeOut}>
-					<option value="text">Plaintext</option>
-					<option value="robot">Beep boops</option>
-					<option value="binary">Binary</option>
-					<option value="octal" disabled>Octal (not yet implemented)</option>
-					<option value="hex" disabled>Hex (not yet implemented)</option>
-					<option value="custom" disabled>Custom (not yet implemented)</option>
-				</select>
-				<textarea
-					type="text"
-					name="output"
-					rows="4"
-					disabled
-					class="p-2 rounded-md shadow-sm caret-pink-500
-                 focus:outline-none focus:ring-2 focus:ring-pink-500"
-					bind:value={textOut}
-				/>
+		</form>
+
+		<div hidden class="logging justify-self-end px-8 py-6 roun8ed-xl shadow-md bg-mantle">
+			<h2 class="text-xl text-teal border-b-solid border-b-2 border-teal pb-1 font-semibold">Logging</h2>
+			<div class="logging-interface">
+				<h3 class="text-subtext0 text-lg my-2">Interface</h3>
+				<ul class="flex gap-2 flex-wrap flex-row items-baseline content-stretch justify-around bg-crust">
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Typing:</h4>
+						<p class="text-green">{typing}</p>
+					</li>
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Input type:</h4>
+						<p class="text-green">{inType}</p>
+					</li>
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Input:</h4>
+						<p class="text-green">{textIn.slice(0,73)+"..."}</p>
+					</li>
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Output type:</h4>
+						<p class="text-green">{outType}</p>
+					</li>					
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Output:</h4>
+						<p class="text-green">{textOut.slice(0,73)+"..."}</p>
+					</li>
+
+				</ul>
+			</div>
+			<div class="logging-adapter">
+				<h3 class="text-subtext0 text-lg my-2">Conversion</h3>
+				<ul class="flex gap-2 flex-wrap flex-row items-baseline content-stretch justify-around bg-crust">
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Text:</h4>
+						<p class="text-green">{translations.text}</p>
+					</li>
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Int:</h4>
+						<p class="text-green">{translations.int}</p>
+					</li>
+					<li style="flex: 1 0 auto;" class="px-2 py-1">
+						<h4 class="text-teal">Binary:</h4>
+						<p class="text-green">{translations.binary.join(' ').slice(0,80)+"..."}</p>
+					</li>
+					<li style="flex: 1 0 auto" class="px-2 py-1">
+						<h4 class="text-teal">Beep boop:</h4>
+						<p class="text-green">{translations.robot.join(' ').slice(0,73)+"..."}</p>
+					</li>
+				</ul>
 			</div>
 		</div>
-	</form>
-</section>
+	</section>
+</div>
 
 <style>
 	.material-symbols-outlined {
